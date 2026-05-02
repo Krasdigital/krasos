@@ -103,6 +103,13 @@ export default function DashboardScreen() {
             <Text style={styles.secondaryNavButtonText}>Open Clients</Text>
           </Pressable>
 
+          <Pressable
+            style={styles.secondaryNavButton}
+            onPress={() => router.push("/projects")}
+          >
+            <Text style={styles.secondaryNavButtonText}>Open Projects</Text>
+          </Pressable>
+
           <Pressable style={styles.signOutButton} onPress={handleSignOut}>
             <Text style={styles.signOutButtonText}>Sign Out</Text>
           </Pressable>

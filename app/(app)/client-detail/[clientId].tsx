@@ -306,15 +306,10 @@ export default function ClientDetailScreen() {
           </View>
 
           <Pressable
-            style={styles.disabledButton}
-            onPress={() =>
-              Alert.alert(
-                "Coming next",
-                "Project creation will be added after the client detail foundation is committed."
-              )
-            }
+            style={styles.projectButton}
+            onPress={() => router.push(`/create-project/${client.id}`)}
           >
-            <Text style={styles.disabledButtonText}>Create Project Soon</Text>
+            <Text style={styles.projectButtonText}>Create Project</Text>
           </Pressable>
         </View>
 
@@ -507,14 +502,14 @@ const styles = StyleSheet.create({
     color: "#52606d",
     lineHeight: 20,
   },
-  disabledButton: {
-    backgroundColor: "#e5eaf0",
+  projectButton: {
+    backgroundColor: "#00bfff",
     borderRadius: 16,
     paddingVertical: 14,
     alignItems: "center",
   },
-  disabledButtonText: {
-    color: "#52606d",
+  projectButtonText: {
+    color: "#ffffff",
     fontWeight: "900",
   },
   notesText: {
