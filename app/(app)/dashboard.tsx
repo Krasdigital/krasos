@@ -89,6 +89,13 @@ export default function DashboardScreen() {
             </View>
           </View>
 
+          <Pressable
+            style={styles.primaryNavButton}
+            onPress={() => router.push("/leads")}
+          >
+            <Text style={styles.primaryNavButtonText}>Open Leads CRM</Text>
+          </Pressable>
+
           <Pressable style={styles.signOutButton} onPress={handleSignOut}>
             <Text style={styles.signOutButtonText}>Sign Out</Text>
           </Pressable>
@@ -208,8 +215,19 @@ const styles = StyleSheet.create({
     color: "#16202a",
     fontWeight: "600",
   },
+  primaryNavButton: {
+    marginTop: 18,
+    backgroundColor: "#00bfff",
+    borderRadius: 14,
+    paddingVertical: 13,
+    alignItems: "center",
+  },
+  primaryNavButtonText: {
+    color: "#ffffff",
+    fontWeight: "900",
+  },
   signOutButton: {
-    marginTop: 14,
+    marginTop: 10,
     backgroundColor: "#16202a",
     borderRadius: 14,
     paddingVertical: 12,
