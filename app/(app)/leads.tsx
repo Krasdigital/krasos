@@ -316,7 +316,11 @@ export default function LeadsScreen() {
             </View>
           ) : (
             leads.map((lead) => (
-              <View key={lead.id} style={styles.leadCard}>
+              <Pressable
+                key={lead.id}
+                style={styles.leadCard}
+                onPress={() => router.push(`/lead-detail/${lead.id}`)}
+              >
                 <View style={styles.leadTopRow}>
                   <View style={styles.leadMainInfo}>
                     <Text style={styles.leadCompany}>{lead.company_name}</Text>
@@ -353,7 +357,7 @@ export default function LeadsScreen() {
                 {lead.notes ? (
                   <Text style={styles.leadNotes}>{lead.notes}</Text>
                 ) : null}
-              </View>
+              </Pressable>
             ))
           )}
         </View>
