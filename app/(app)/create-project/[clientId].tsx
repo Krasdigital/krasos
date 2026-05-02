@@ -1,3 +1,4 @@
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import {
@@ -32,8 +33,62 @@ export default function CreateProjectScreen() {
   const [priority, setPriority] = useState("medium");
   const [startDate, setStartDate] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showDuePicker, setShowDuePicker] = useState(false);
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  function formatDateForDatabase(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function formatDateForDisplay(dateString: string) {
+    if (!dateString) {
+      return "";
+    }
+
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  }
+
+  function dateFromString(dateString: string) {
+    if (!dateString) {
+      return new Date();
+    }
+
+    const [year, month, day] = dateString.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  function handleStartDateChange(_event: unknown, selectedDate?: Date) {
+    if (Platform.OS === "android") {
+      setShowStartPicker(false);
+    }
+
+    if (selectedDate) {
+      setStartDate(formatDateForDatabase(selectedDate));
+    }
+  }
+
+  function handleDueDateChange(_event: unknown, selectedDate?: Date) {
+    if (Platform.OS === "android") {
+      setShowDuePicker(false);
+    }
+
+    if (selectedDate) {
+      setDueDate(formatDateForDatabase(selectedDate));
+    }
+  }
 
   async function handleCreateProject() {
     if (!organization?.id || !clientId) {
@@ -154,22 +209,82 @@ export default function CreateProjectScreen() {
             </View>
 
             <View style={styles.twoColumnRow}>
-              <TextInput
-                style={[styles.input, styles.halfInput]}
-                placeholder="Start date YYYY-MM-DD"
-                placeholderTextColor="#8a96a3"
-                value={startDate}
-                onChangeText={setStartDate}
-              />
+              <View style={styles.dateField}>
+                <Text style={styles.dateLabel}>Start Date</Text>
+                <Pressable
+                  style={styles.dateButton}
+                  onPress={() => setShowStartPicker(true)}
+                >
+                  <Text
+                    style={[
+                      styles.dateButtonText,
+                      !startDate && styles.dateButtonPlaceholder,
+                    ]}
+                  >
+                    {startDate ? formatDateForDisplay(startDate) : "Select date"}
+                  </Text>
+                </Pressable>
 
-              <TextInput
-                style={[styles.input, styles.halfInput]}
-                placeholder="Due date YYYY-MM-DD"
-                placeholderTextColor="#8a96a3"
-                value={dueDate}
-                onChangeText={setDueDate}
-              />
+                {startDate ? (
+                  <Pressable onPress={() => setStartDate("")}>
+                    <Text style={styles.clearDateText}>Clear</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+
+              <View style={styles.dateField}>
+                <Text style={styles.dateLabel}>Due Date</Text>
+                <Pressable
+                  style={styles.dateButton}
+                  onPress={() => setShowDuePicker(true)}
+                >
+                  <Text
+                    style={[
+                      styles.dateButtonText,
+                      !dueDate && styles.dateButtonPlaceholder,
+                    ]}
+                  >
+                    {dueDate ? formatDateForDisplay(dueDate) : "Select date"}
+                  </Text>
+                </Pressable>
+
+                {dueDate ? (
+                  <Pressable onPress={() => setDueDate("")}>
+                    <Text style={styles.clearDateText}>Clear</Text>
+                  </Pressable>
+                ) : null}
+              </View>
             </View>
+
+            {showStartPicker ? (
+              <DateTimePicker
+                value={dateFromString(startDate)}
+                mode="date"
+                display={Platform.OS === "ios" ? "inline" : "default"}
+                onChange={handleStartDateChange}
+              />
+            ) : null}
+
+            {showDuePicker ? (
+              <DateTimePicker
+                value={dateFromString(dueDate)}
+                mode="date"
+                display={Platform.OS === "ios" ? "inline" : "default"}
+                onChange={handleDueDateChange}
+              />
+            ) : null}
+
+            {Platform.OS === "ios" && (showStartPicker || showDuePicker) ? (
+              <Pressable
+                style={styles.doneDateButton}
+                onPress={() => {
+                  setShowStartPicker(false);
+                  setShowDuePicker(false);
+                }}
+              >
+                <Text style={styles.doneDateButtonText}>Done Selecting Date</Text>
+              </Pressable>
+            ) : null}
 
             <TextInput
               style={[styles.input, styles.descriptionInput]}
@@ -280,6 +395,50 @@ const styles = StyleSheet.create({
   },
   halfInput: {
     flex: 1,
+  },
+  dateField: {
+    flex: 1,
+    gap: 6,
+  },
+  dateLabel: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: "#7b8794",
+    textTransform: "uppercase",
+    letterSpacing: 0.7,
+  },
+  dateButton: {
+    borderWidth: 1,
+    borderColor: "#d9e0e7",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    backgroundColor: "#f9fafb",
+  },
+  dateButtonText: {
+    fontSize: 15,
+    color: "#16202a",
+    fontWeight: "700",
+  },
+  dateButtonPlaceholder: {
+    color: "#8a96a3",
+    fontWeight: "500",
+  },
+  clearDateText: {
+    color: "#52606d",
+    fontWeight: "800",
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  doneDateButton: {
+    backgroundColor: "#16202a",
+    borderRadius: 14,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  doneDateButtonText: {
+    color: "#ffffff",
+    fontWeight: "900",
   },
   descriptionInput: {
     minHeight: 110,
