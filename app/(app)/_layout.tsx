@@ -2,6 +2,7 @@ import { Redirect, Stack } from "expo-router";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { useAuth } from "../../src/features/auth/AuthProvider";
+import { WorkspaceProvider } from "../../src/features/workspace/WorkspaceProvider";
 
 export default function AppLayout() {
   const { loading, session } = useAuth();
@@ -18,7 +19,11 @@ export default function AppLayout() {
     return <Redirect href="/login" />;
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <WorkspaceProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </WorkspaceProvider>
+  );
 }
 
 const styles = StyleSheet.create({
