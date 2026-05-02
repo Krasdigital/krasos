@@ -1,9 +1,9 @@
-import { Redirect } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
-import { useAuth } from "../src/features/auth/AuthProvider";
+import { useAuth } from "../../src/features/auth/AuthProvider";
 
-export default function IndexScreen() {
+export default function AuthLayout() {
   const { loading, session } = useAuth();
 
   if (loading) {
@@ -14,11 +14,11 @@ export default function IndexScreen() {
     );
   }
 
-  if (!session) {
-    return <Redirect href="/login" />;
+  if (session) {
+    return <Redirect href="/dashboard" />;
   }
 
-  return <Redirect href="/dashboard" />;
+  return <Stack screenOptions={{ headerShown: false }} />;
 }
 
 const styles = StyleSheet.create({
