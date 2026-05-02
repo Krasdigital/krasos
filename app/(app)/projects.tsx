@@ -146,7 +146,11 @@ export default function ProjectsScreen() {
             </View>
           ) : (
             projects.map((project) => (
-              <View key={project.id} style={styles.projectCard}>
+              <Pressable
+                key={project.id}
+                style={styles.projectCard}
+                onPress={() => router.push(`/project-detail/${project.id}`)}
+              >
                 <View style={styles.projectTopRow}>
                   <View style={styles.projectMainInfo}>
                     <Text style={styles.projectName}>{project.name}</Text>
@@ -174,7 +178,9 @@ export default function ProjectsScreen() {
                     Due: {project.due_date || "Not set"}
                   </Text>
                 </View>
-              </View>
+
+                <Text style={styles.openText}>Tap to manage project →</Text>
+              </Pressable>
             ))
           )}
         </View>
@@ -336,5 +342,10 @@ const styles = StyleSheet.create({
   dateText: {
     color: "#52606d",
     fontWeight: "700",
+  },
+  openText: {
+    marginTop: 8,
+    color: "#16202a",
+    fontWeight: "900",
   },
 });
