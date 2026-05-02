@@ -162,7 +162,11 @@ export default function ClientsScreen() {
             </View>
           ) : (
             clients.map((client) => (
-              <View key={client.id} style={styles.clientCard}>
+              <Pressable
+                key={client.id}
+                style={styles.clientCard}
+                onPress={() => router.push(`/client-detail/${client.id}`)}
+              >
                 <View style={styles.clientTopRow}>
                   <View style={styles.clientMainInfo}>
                     <Text style={styles.clientName}>{client.name}</Text>
@@ -203,7 +207,9 @@ export default function ClientsScreen() {
                     Converted from lead pipeline
                   </Text>
                 ) : null}
-              </View>
+
+                <Text style={styles.openText}>Tap to manage client →</Text>
+              </Pressable>
             ))
           )}
         </View>
@@ -368,6 +374,11 @@ const styles = StyleSheet.create({
   convertedText: {
     marginTop: 6,
     color: "#0284c7",
+    fontWeight: "900",
+  },
+  openText: {
+    marginTop: 8,
+    color: "#16202a",
     fontWeight: "900",
   },
 });
