@@ -44,8 +44,10 @@ export default function LeadDetailScreen() {
   const { organization, loading: workspaceLoading } = useWorkspace();
 
   const [lead, setLead] = useState<Lead | null>(null);
+  const [convertedClientId, setConvertedClientId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [converting, setConverting] = useState(false);
 
   const leadId = useMemo(() => {
     const rawLeadId = params.leadId;
@@ -74,6 +76,23 @@ export default function LeadDetailScreen() {
       }
 
       setLead(data);
+
+      if (data?.id) {
+        const { data: clientData, error: clientError } = await supabase
+          .from("clients")
+          .select("id")
+          .eq("organization_id", organization.id)
+          .eq("source_lead_id", data.id)
+          .maybeSingle();
+
+        if (clientError) {
+          throw clientError;
+        }
+
+        setConvertedClientId(clientData?.id ?? null);
+      } else {
+        setConvertedClientId(null);
+      }
     } catch (caughtError) {
       const message =
         caughtError instanceof Error ? caughtError.message : "Unable to load lead.";
@@ -117,6 +136,46 @@ export default function LeadDetailScreen() {
       Alert.alert("Status update failed", message);
     } finally {
       setUpdatingStatus(null);
+    }
+  }
+
+  async function convertLeadToClient() {
+    if (!lead?.id) {
+      return;
+    }
+
+    try {
+      setConverting(true);
+
+      const { error } = await supabase.rpc("convert_lead_to_client", {
+        target_lead_id: lead.id,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      await loadLead();
+
+      Alert.alert(
+        "Lead converted",
+        "This lead is now an active client.",
+        [
+          {
+            text: "View Clients",
+            onPress: () => router.replace("/clients"),
+          },
+        ]
+      );
+    } catch (caughtError) {
+      const message =
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Unable to convert lead.";
+
+      Alert.alert("Conversion failed", message);
+    } finally {
+      setConverting(false);
     }
   }
 
@@ -246,6 +305,45 @@ export default function LeadDetailScreen() {
               );
             })}
           </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Conversion</Text>
+
+          {convertedClientId || lead.status === "won" ? (
+            <>
+              <Text style={styles.convertedTitle}>Already Converted</Text>
+              <Text style={styles.notesText}>
+                This lead has already been converted into a client. Manage the
+                active customer from the Clients dashboard.
+              </Text>
+
+              <Pressable
+                style={styles.convertButton}
+                onPress={() => router.replace("/clients")}
+              >
+                <Text style={styles.convertButtonText}>Open Clients Dashboard</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <Text style={styles.notesText}>
+                If this prospect becomes a paying customer, convert them into a
+                client. Kras OS will copy their lead info into the client layer and
+                mark this lead as won.
+              </Text>
+
+              <Pressable
+                style={[styles.convertButton, converting && styles.buttonDisabled]}
+                onPress={convertLeadToClient}
+                disabled={converting}
+              >
+                <Text style={styles.convertButtonText}>
+                  {converting ? "Converting..." : "Convert Lead to Client"}
+                </Text>
+              </Pressable>
+            </>
+          )}
         </View>
 
         <View style={styles.card}>
@@ -433,6 +531,26 @@ const styles = StyleSheet.create({
   notesText: {
     color: "#52606d",
     lineHeight: 21,
+  },
+  convertedTitle: {
+    color: "#0284c7",
+    fontWeight: "900",
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  convertButton: {
+    marginTop: 14,
+    backgroundColor: "#00bfff",
+    borderRadius: 16,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  convertButtonText: {
+    color: "#ffffff",
+    fontWeight: "900",
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   deleteButton: {
     backgroundColor: "#991b1b",

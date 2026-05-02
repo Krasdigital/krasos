@@ -96,6 +96,13 @@ export default function DashboardScreen() {
             <Text style={styles.primaryNavButtonText}>Open Leads CRM</Text>
           </Pressable>
 
+          <Pressable
+            style={styles.secondaryNavButton}
+            onPress={() => router.push("/clients")}
+          >
+            <Text style={styles.secondaryNavButtonText}>Open Clients</Text>
+          </Pressable>
+
           <Pressable style={styles.signOutButton} onPress={handleSignOut}>
             <Text style={styles.signOutButtonText}>Sign Out</Text>
           </Pressable>
@@ -224,6 +231,19 @@ const styles = StyleSheet.create({
   },
   primaryNavButtonText: {
     color: "#ffffff",
+    fontWeight: "900",
+  },
+  secondaryNavButton: {
+    marginTop: 10,
+    backgroundColor: "#ffffff",
+    borderRadius: 14,
+    paddingVertical: 13,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#d9e0e7",
+  },
+  secondaryNavButtonText: {
+    color: "#16202a",
     fontWeight: "900",
   },
   signOutButton: {

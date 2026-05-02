@@ -192,6 +192,13 @@ export default function LeadsScreen() {
             Capture contractor prospects, track outreach, and start building the
             Golden Index pipeline inside Kras OS.
           </Text>
+
+          <Pressable
+            style={styles.clientsButton}
+            onPress={() => router.push("/clients")}
+          >
+            <Text style={styles.clientsButtonText}>Open Clients Dashboard</Text>
+          </Pressable>
         </View>
 
         <View style={styles.metricsRow}>
@@ -417,6 +424,17 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     color: "#52606d",
+  },
+  clientsButton: {
+    marginTop: 18,
+    backgroundColor: "#00bfff",
+    borderRadius: 14,
+    paddingVertical: 13,
+    alignItems: "center",
+  },
+  clientsButtonText: {
+    color: "#ffffff",
+    fontWeight: "900",
   },
   metricsRow: {
     flexDirection: "row",
